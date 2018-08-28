@@ -95,7 +95,7 @@ function datPanel() {
 	gui = new dat.GUI();
 	var circle = gui.addFolder('Circle');
 	circle.add(config, 'k', 1, 10);
-	circle.add(config, 'm', 1000, 5000);
+	circle.add(config, 'm', 0, 5000);
 	circle.add(config, 'r', 10, 500);
 	circle.add(config, 'rad2', 0, 15);
 	circle.add(config, 'mr2', 0, 15);
@@ -109,25 +109,23 @@ function draw() {
 
 	// loop through snowflakes with a for..of loop
 	stroke(255);
-/*
+
 	var spectrum = fft.analyze();
 	particles.forEach(function(particle, i) {
 		particle.update(frameCount / 60, spectrum[i]);
 		particle.display();
 	});
-
-*/
-	/*
+	
 	translate(0,0);
 	stroke(255);
-	beginShape();
+	//beginShape();
 	for(var i = 0; i < (spectrum.length/2); i++) {
 		var y = map(spectrum[i], 0, 1024, windowHeight, -1024) + noise(map(spectrum[i], 0, 1024, windowHeight, 0));
 		vertex(i*(windowWidth/512), y);
 	}
-	endShape();
+	// endShape();
 
-   */
+   
 	amplitudeCircle();	  
 	pop();
 	stats.end();
@@ -139,6 +137,10 @@ function amplitudeCircle() {
 	level = amplitude.getLevel();
 	var size = map(level, 0, 1, config.startSize, config.stopSize, true);
 
+	noFill();
+	color(255);
+	beginShape();
+	var frameC = frameCount / 600;
 	for(var k=0; k<config.k; k++) {
 		for(var i=0; i< config.m; i++) {
 
@@ -177,12 +179,12 @@ function amplitudeCircle() {
 
 		  	var x = ( (config.r) +0.25*k)*cos(theta) + dx;
 		  	var y = ( (config.r) +0.25*k)*sin(theta) + dy;
-
 		  
 		  	stroke(230, 50);
-		  	point(x, y);
+		  	vertex(x, y);
 		}
 	}
+	endShape(CLOSE);
 	
 }
 
