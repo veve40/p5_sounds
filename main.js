@@ -7,8 +7,8 @@ function preload() {
 
 var myConfig = function() {
 	// amplitude circle
-	this.k = 1.5;
-	this.m = 1200;
+	this.k = 4;
+	this.m = 300;
 	this.r = 300;
 	this.part = 2.0;
 	this.rad1 = 1.5;
@@ -17,8 +17,8 @@ var myConfig = function() {
 	this.mr2 = 2.1;
 	this.startSize = -2;
 	this.stopSize = 2;
-	this.dxConst = 129+0.29;
-	this.dyConst = 923+0.29;
+	this.dxConst = 129.29;
+	this.dyConst = 923.29;
 
 };
 
@@ -97,6 +97,7 @@ function datPanel() {
 	circle.add(config, 'k', 1, 10);
 	circle.add(config, 'm', 0, 5000);
 	circle.add(config, 'r', 10, 500);
+	circle.add(config, 'rad1', 0, 15);
 	circle.add(config, 'rad2', 0, 15);
 	circle.add(config, 'mr2', 0, 15);
 }
@@ -106,7 +107,7 @@ function draw() {
 	stats.begin();
 	background(0);
 	push();
-
+/*
 	// loop through snowflakes with a for..of loop
 	stroke(255);
 
@@ -125,7 +126,7 @@ function draw() {
 	}
 	// endShape();
 
-   
+   */
 	amplitudeCircle();	  
 	pop();
 	stats.end();
@@ -134,51 +135,54 @@ function draw() {
 function amplitudeCircle() {
 	
 	translate(windowWidth/2,windowHeight/2);
+
+	// retrieve sound info
 	level = amplitude.getLevel();
 	var size = map(level, 0, 1, config.startSize, config.stopSize, true);
 
 	noFill();
 	color(255);
 	beginShape();
-	var frameC = frameCount / 600;
+	
+	var frameMap = map((frameCount/60), 0, 100, 0, 300, true);	
+
 	for(var k=0; k<config.k; k++) {
 		for(var i=0; i< config.m; i++) {
 
 			var theta = TWO_PI*i/config.m;
 
+			var p = 1.0*i/config.m;
+
 			var l = 1+30*ease(
 			  constrain(
 				  map(
-					noise(15 + config.rad1 * cos(theta), 
-					config.rad1 * sin(theta), 
-					config.mr1 * cos(TWO_PI),
-					config.mr1 * sin(TWO_PI)) + 0.25 * sin(TWO_PI*(0.25)) -0.25,
-					-1,
-					1,
-					-1,
-					2
+					noise(
+						(config.rad1 * cos(theta)) * size,
+						(config.rad2 * sin(theta)) * size
+						// config.mr1 * sin(TWO_PI)
+					), // + 0.25 * sin(TWO_PI*(0.25)) -0.25, // value
+					-1, // start 1
+					1, // stop 1
+					-1, // start 2
+					1, // stop 2
+					1
 				  ), 0, 1
-				), 2.0
+				)
 			);
 			
-	  		var p = 1.0*i/config.m;
-
+			
 			var dx = l*noise(
-				(config.dxConst)*k + config.rad2*cos(TWO_PI*(size*p)),
-				(config.rad2)*sin(TWO_PI*(size*p)),
-				(config.mr2)*cos(TWO_PI),
-				(config.mr2)*sin(TWO_PI)
+				(config.dxConst)*k + cos(frameMap),
+				sin(frameMap) *sin(TWO_PI/(size*p)),
 			);
 
       		var dy = l*noise(
-				(config.dyConst)*k + config.rad2 * cos(TWO_PI*(size*p)),
-				config.rad2*sin(TWO_PI*(size*p)),
-				config.mr2*cos(TWO_PI),
-				config.mr2*sin(TWO_PI)
+				(config.dyConst)*k + sin(frameMap),
+				cos(frameMap) *sin(TWO_PI/(size*p)),
 			);
 
-		  	var x = ( (config.r) +0.25*k)*cos(theta) + dx;
-		  	var y = ( (config.r) +0.25*k)*sin(theta) + dy;
+		  	var x = (config.r) * cos(theta) + dx;
+		  	var y = (config.r) * sin(theta) + dy;
 		  
 		  	stroke(230, 50);
 		  	vertex(x, y);
