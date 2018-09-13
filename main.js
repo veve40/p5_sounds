@@ -19,6 +19,7 @@ var myConfig = function() {
 	this.stopSize = 2;
 	this.dxConst = 129.29;
 	this.dyConst = 923.29;
+	this.lineDistance = 30;
 
 };
 
@@ -86,6 +87,7 @@ function Particle() {
 	};
 
 	this.display = function() {
+		fill(255);
 	  	ellipse(this.posX, this.posY, this.size);
 	};
 };
@@ -100,35 +102,42 @@ function datPanel() {
 	circle.add(config, 'rad1', 0, 15);
 	circle.add(config, 'rad2', 0, 15);
 	circle.add(config, 'mr2', 0, 15);
+	var dots = gui.addFolder('Dots');
+	dots.add(config, 'lineDistance', 5, 500);
 }
 
 function draw() {
 	
 	stats.begin();
 	background(0);
-	push();
-/*
-	// loop through snowflakes with a for..of loop
-	stroke(255);
+	// push();
 
+	// loop through snowflakes with a for..of loop
+	stroke(200);
+	
 	var spectrum = fft.analyze();
 	particles.forEach(function(particle, i) {
-		particle.update(frameCount / 60, spectrum[i]);
+		particle.update(frameCount/200, spectrum[i]);
 		particle.display();
+		particles.forEach(function(lpart, p) {
+			if(particle == lpart) return;
+			let dis = int(dist(particle.posX, particle.posY, lpart.posX, lpart.posY));
+			if(dis <= config.lineDistance) line(particle.posX, particle.posY, lpart.posX, lpart.posY);
+		});
 	});
+
 	
 	translate(0,0);
-	stroke(255);
 	//beginShape();
 	for(var i = 0; i < (spectrum.length/2); i++) {
-		var y = map(spectrum[i], 0, 1024, windowHeight, -1024) + noise(map(spectrum[i], 0, 1024, windowHeight, 0));
-		vertex(i*(windowWidth/512), y);
+		// var y = map(spectrum[i], 0, 50, windowHeight, -50) + noise(map(spectrum[i], 0, 50, windowHeight, 0));
+		// vertex(i*(windowWidth/512), y);
 	}
 	// endShape();
 
-   */
+   
 	amplitudeCircle();	  
-	pop();
+	// pop();
 	stats.end();
 }
 
